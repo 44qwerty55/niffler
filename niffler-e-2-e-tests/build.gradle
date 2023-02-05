@@ -24,7 +24,8 @@ dependencies {
     testImplementation 'org.junit.jupiter:junit-jupiter:5.9.2'
     testImplementation 'com.squareup.retrofit2:retrofit:2.9.0'
     testImplementation 'com.squareup.retrofit2:converter-jackson:2.9.0'
-    testImplementation 'com.squareup.okhttp:logging-interceptor:2.7.5'
+    //testImplementation 'com.squareup.okhttp:logging-interceptor:2.7.5'
+    testImplementation 'com.squareup.okhttp3:logging-interceptor:3.9.0'
     implementation("io.qameta.allure:allure-junit5:2.20.1") {
         exclude group: "org.junit.platform"
         exclude group: "org.junit.jupiter"
@@ -37,10 +38,11 @@ dependencies {
     implementation group: 'net.javacrumbs.json-unit', name: 'json-unit-core', version: '2.36.0'
     implementation 'io.qameta.allure:allure-jsonunit:2.20.1'
 
-    compileOnly 'org.projectlombok:lombok:1.18.24'
+  compileOnly 'org.projectlombok:lombok:1.18.24'
     annotationProcessor 'org.projectlombok:lombok:1.18.24'
     testCompileOnly 'org.projectlombok:lombok:1.18.24'
     testAnnotationProcessor 'org.projectlombok:lombok:1.18.24'
+    implementation  'org.postgresql:postgresql:42.5.1'
 }
 
 test {
