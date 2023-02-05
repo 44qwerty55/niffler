@@ -31,8 +31,9 @@ public class UsersListExtension implements
 
         Arrays.stream(context.getRequiredTestMethod().getParameters())
                 .forEach(it -> {
-                    it.isAnnotationPresent(User.class);
-                    userTypes.add(it.getAnnotation(User.class).userType());
+                    if (it.isAnnotationPresent(User.class)) {
+                        userTypes.add(it.getAnnotation(User.class).userType());
+                    }
                 });
 
         Map<User.UserType, UserModel> users = new HashMap<>();
