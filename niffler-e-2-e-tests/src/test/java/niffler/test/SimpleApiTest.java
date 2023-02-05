@@ -9,7 +9,7 @@ import org.junit.jupiter.params.provider.ValueSource;
 
 public class SimpleApiTest {
 
-    private NifflerSpendClient nsc = new NifflerSpendClient();
+    private NifflerSpendClient nifflerSpendClient = new NifflerSpendClient();
 
     @ValueSource(strings = {
             "data/spend0.json",
@@ -17,7 +17,7 @@ public class SimpleApiTest {
     })
     @ParameterizedTest
     void addSpend(@Spend SpendJson spend) throws Exception {
-        SpendJson created = nsc.createSpend(spend);
+        SpendJson created = nifflerSpendClient.createSpend(spend);
         Assertions.assertNotNull(created.getId());
     }
 }

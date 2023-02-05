@@ -1,12 +1,12 @@
 package niffler.api;
 
-import niffler.model.SpendJson;
+import niffler.model.UserDataJson;
 import okhttp3.OkHttpClient;
 import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Retrofit;
 import retrofit2.converter.jackson.JacksonConverterFactory;
 
-public class NifflerSpendClient {
+public class NifflerUserDataClient {
 
     HttpLoggingInterceptor interceptor = new HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY);
 
@@ -16,15 +16,15 @@ public class NifflerSpendClient {
             .build();
 
     private Retrofit retrofit = new Retrofit.Builder()
-            .baseUrl(NifflerSpendService.nifflerSpendUri)
+            .baseUrl(NifflerUserDataService.nifflerUserDataUri)
             .addConverterFactory(JacksonConverterFactory.create())
             .client(okHttpClient)
             .build();
 
-    private NifflerSpendService nifflerSpendService = retrofit.create(NifflerSpendService.class);
+    private NifflerUserDataService nifflerUserDataService = retrofit.create(NifflerUserDataService.class);
 
-    public SpendJson createSpend(SpendJson spend) throws Exception {
-        return nifflerSpendService.addSpend(spend).execute().body();
+    public UserDataJson updateUserData(UserDataJson userDataJson) throws Exception {
+        return nifflerUserDataService.updateUserInfo(userDataJson).execute().body();
     }
 
 }
