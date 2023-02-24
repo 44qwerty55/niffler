@@ -26,12 +26,17 @@ dependencies {
     testImplementation 'org.hibernate:hibernate-core:6.1.7.Final'
     testImplementation 'io.qameta.allure:allure-attachments:2.21.0'
     testImplementation 'com.github.vertical-blank:sql-formatter:2.0.3'
+    testImplementation 'org.springframework.security:spring-security-crypto:6.0.1'
     testImplementation("io.qameta.allure:allure-junit5:2.21.0") {
         exclude group: "org.junit.jupiter-api"
         exclude group: "org.junit.platform"
         exclude group: "org.junit.jupiter"
     }
     testImplementation 'com.codeborne:selenide:6.11.1'
+    compileOnly 'org.projectlombok:lombok:1.18.24'
+    annotationProcessor 'org.projectlombok:lombok:1.18.24'
+    testCompileOnly 'org.projectlombok:lombok:1.18.24'
+    testAnnotationProcessor 'org.projectlombok:lombok:1.18.24'
     testImplementation 'com.github.javafaker:javafaker:1.0.2'
     testImplementation 'com.google.code.findbugs:jsr305:3.0.2'
 }
