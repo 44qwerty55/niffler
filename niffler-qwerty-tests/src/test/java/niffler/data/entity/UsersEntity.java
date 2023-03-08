@@ -1,23 +1,21 @@
 package niffler.data.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.experimental.Accessors;
 import niffler.model.CurrencyValues;
+import niffler.model.UserJson;
 
-import java.util.Arrays;
-import java.util.Objects;
-import java.util.UUID;
+import java.util.*;
 
+@Getter
+@Setter
+@Accessors(chain = true)
 @Entity
 @Table(name = "users", schema = "public", catalog = "niffler-userdata")
 public class UsersEntity {
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     @Id
     @Column(name = "id")
     private UUID id;
@@ -37,52 +35,24 @@ public class UsersEntity {
     @Column(name = "photo")
     private byte[] photo;
 
-    public UUID getId() {
-        return id;
+    @OneToMany(fetch = FetchType.LAZY)
+    @JoinTable(name = "users_friends",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "friend_id"))
+    private List<UsersEntity> friends = new ArrayList<>();
+
+    public UsersEntity addFriends(UsersEntity... friends) {
+        this.friends.addAll(Arrays.asList(friends));
+        return this;
     }
 
-    public void setId(UUID id) {
-        this.id = id;
-    }
-
-    public String getUsername() {
-        return username;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
-    public CurrencyValues getCurrency() {
-        return currency;
-    }
-
-    public void setCurrency(CurrencyValues currency) {
-        this.currency = currency;
-    }
-
-    public String getFirstname() {
-        return firstname;
-    }
-
-    public void setFirstname(String firstname) {
-        this.firstname = firstname;
-    }
-
-    public String getSurname() {
-        return surname;
-    }
-
-    public void setSurname(String surname) {
-        this.surname = surname;
-    }
-
-    public byte[] getPhoto() {
-        return photo;
-    }
-
-    public void setPhoto(byte[] photo) {
-        this.photo = photo;
+    public static UsersEntity fromUserJson(UserJson user) {
+        UsersEntity usersEntity = new UsersEntity();
+        usersEntity.setUsername(user.getUserName())
+                .setFirstname(user.getFirstname())
+                .setSurname(user.getSurname())
+                .setCurrency(user.getCurrency());
+        return usersEntity;
     }
 
     @Override

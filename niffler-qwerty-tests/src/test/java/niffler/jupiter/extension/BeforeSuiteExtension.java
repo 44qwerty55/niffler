@@ -3,6 +3,8 @@ package niffler.jupiter.extension;
 import io.restassured.RestAssured;
 import io.restassured.filter.log.RequestLoggingFilter;
 import io.restassured.filter.log.ResponseLoggingFilter;
+import jakarta.persistence.EntityManagerFactory;
+import niffler.data.jpa.EmfContext;
 import org.awaitility.Awaitility;
 import org.junit.jupiter.api.extension.ExtensionContext;
 
@@ -26,6 +28,7 @@ public class BeforeSuiteExtension implements AroundAllTestsExtension {
 
     @Override
     public void afterAllTests() {
+        EmfContext.INSTANCE.storedEmf().forEach(EntityManagerFactory::close);
         System.out.println("AFTER SUITE!");
     }
 }
