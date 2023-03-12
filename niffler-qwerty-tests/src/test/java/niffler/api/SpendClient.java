@@ -4,6 +4,7 @@ import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.http.ContentType;
 import io.restassured.response.ValidatableResponse;
 import io.restassured.specification.RequestSpecification;
+import niffler.model.CategoryJson;
 import niffler.model.SpendDto;
 
 import java.util.List;
@@ -18,6 +19,15 @@ public class SpendClient {
                 .body(body)
                 .post("/addSpend")
                 .then();
+    }
+
+    public CategoryJson postCategory(CategoryJson body) {
+        return given()
+                .spec(requestSpec())
+                .body(body)
+                .post("/category")
+                .then()
+                .extract().as(CategoryJson.class);
     }
 
     public ValidatableResponse getSpend(SpendDto body) {

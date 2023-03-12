@@ -2,6 +2,7 @@ package niffler.api;
 
 import niffler.api.service.NifflerUserDataService;
 import niffler.model.UserDataJson;
+import niffler.model.UserJson;
 import okhttp3.OkHttpClient;
 import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Retrofit;
@@ -26,6 +27,12 @@ public class NifflerUseDataClient {
 
     public UserDataJson updateUserData(UserDataJson userDataJson) throws Exception {
         return nifflerUserDataService.updateUserInfo(userDataJson).execute().body();
+    }
+
+    public UserJson getCurrentUser(String username) throws Exception {
+        return nifflerUserDataService.currentUser(username)
+                .execute()
+                .body();
     }
 
 }
