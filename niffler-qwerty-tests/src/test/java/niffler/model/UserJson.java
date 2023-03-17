@@ -1,11 +1,15 @@
 package niffler.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
+@Getter
+@Setter
 public class UserJson {
     @JsonProperty("id")
     private UUID id;
@@ -23,70 +27,7 @@ public class UserJson {
     private String password;
 
     private transient List<CategoryJson> categoryJsons;
-
-    public UUID getId() {
-        return id;
-    }
-
-    public void setId(UUID id) {
-        this.id = id;
-    }
-
-    public String getUserName() {
-        return userName;
-    }
-
-    public void setUserName(String userName) {
-        this.userName = userName;
-    }
-
-    public String getFirstname() {
-        return firstname;
-    }
-
-    public void setFirstname(String firstname) {
-        this.firstname = firstname;
-    }
-
-    public String getSurname() {
-        return surname;
-    }
-
-    public void setSurname(String surname) {
-        this.surname = surname;
-    }
-
-    public CurrencyValues getCurrency() {
-        return currency;
-    }
-
-    public void setCurrency(CurrencyValues currency) {
-        this.currency = currency;
-    }
-
-    public String getPhoto() {
-        return photo;
-    }
-
-    public void setPhoto(String photo) {
-        this.photo = photo;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    public List<CategoryJson> getCategoryJsons() {
-        return categoryJsons;
-    }
-
-    public void setCategoryJsons(List<CategoryJson> categoryJsons) {
-        this.categoryJsons = categoryJsons;
-    }
+    private transient List<SpendDto> spendJsons;
 
     @Override
     public boolean equals(Object o) {
