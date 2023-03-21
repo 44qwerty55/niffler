@@ -136,34 +136,11 @@ public class SpendService {
 
         List<StatisticByCategoryJson> sbcjResult = new ArrayList<>();
         for (Map.Entry<String, List<SpendJson>> entry : spendsByCategory.entrySet()) {
-            StatisticByCategoryJson sbcj = new StatisticByCategoryJson();
-            sbcj.setCategory(entry.getKey());
-            sbcj.setSpends(entry.getValue());
-            sbcj.setTotal(entry.getValue().stream()
-                    .map(SpendJson::getAmount)
-                    .map(BigDecimal::valueOf)
-                    .reduce(BigDecimal.ZERO, BigDecimal::add).doubleValue());
-            sbcj.setTotalInUserDefaultCurrency(
-                    grpcCurrencyClient.calculate(
-                            sbcj.getTotal(),
-                            statisticCurrency,
-                            userCurrency
-                    ).doubleValue()
-            );
+            StatisticByCategoryJson sbcj = createStatisticByCategory(statisticCurrency, userCurrency, entry);
             sbcjResult.add(sbcj);
         }
 
-        categoryRepository.findAllByUsername(username).stream()
-                .filter(c -> !spendsByCategory.containsKey(c.getCategory()))
-                .map(c -> {
-                    StatisticByCategoryJson sbcj = new StatisticByCategoryJson();
-                    sbcj.setCategory(c.getCategory());
-                    sbcj.setSpends(Collections.emptyList());
-                    sbcj.setTotal(0.0);
-                    sbcj.setTotalInUserDefaultCurrency(0.0);
-                    return sbcj;
-                })
-                .forEach(sbcjResult::add);
+        addEmptySpendCategoriesToStatistic(username, spendsByCategory, sbcjResult);
 
         sbcjResult.sort(Comparator.comparing(StatisticByCategoryJson::getCategory));
         statistic.setCategoryStatistics(sbcjResult);
@@ -236,6 +213,41 @@ public class SpendService {
         statistic.setTotal(0.0);
         statistic.setTotalInUserDefaultCurrency(0.0);
         return statistic;
+    }
+
+    @Nonnull
+    StatisticByCategoryJson createStatisticByCategory(@Nonnull CurrencyValues statisticCurrency,
+                                                      @Nonnull CurrencyValues userCurrency,
+                                                      @Nonnull Map.Entry<String, List<SpendJson>> entry) {
+        StatisticByCategoryJson sbcj = new StatisticByCategoryJson();
+        sbcj.setCategory(entry.getKey());
+        sbcj.setSpends(entry.getValue());
+        sbcj.setTotal(entry.getValue().stream()
+                .map(SpendJson::getAmount)
+                .map(BigDecimal::valueOf)
+                .reduce(BigDecimal.ZERO, BigDecimal::add).doubleValue());
+        sbcj.setTotalInUserDefaultCurrency(
+                grpcCurrencyClient.calculate(
+                        sbcj.getTotal(),
+                        statisticCurrency,
+                        userCurrency
+                ).doubleValue()
+        );
+        return sbcj;
+    }
+
+    void addEmptySpendCategoriesToStatistic(String username, Map<String, List<SpendJson>> spendsByCategory, List<StatisticByCategoryJson> sbcjResult) {
+        categoryRepository.findAllByUsername(username).stream()
+                .filter(c -> !spendsByCategory.containsKey(c.getCategory()))
+                .map(c -> {
+                    StatisticByCategoryJson sbcj = new StatisticByCategoryJson();
+                    sbcj.setCategory(c.getCategory());
+                    sbcj.setSpends(Collections.emptyList());
+                    sbcj.setTotal(0.0);
+                    sbcj.setTotalInUserDefaultCurrency(0.0);
+                    return sbcj;
+                })
+                .forEach(sbcjResult::add);
     }
 
     @Nonnull

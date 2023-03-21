@@ -6,6 +6,7 @@ import niffler.data.repository.CategoryRepository;
 import niffler.data.repository.SpendRepository;
 import niffler.model.CurrencyValues;
 import niffler.model.SpendJson;
+import niffler.model.StatisticByCategoryJson;
 import niffler.model.StatisticJson;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -17,11 +18,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
-import java.util.Calendar;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -207,6 +204,59 @@ class SpendServiceTest {
         List<SpendJson> fishCatchSpends = map.get("Рыбалка");
         assertEquals(2, barSpends.size());
         assertEquals(1, fishCatchSpends.size());
+    }
+
+    @Test
+    void createStatisticByCategoryTest() {
+        Date dateTo = new Date();
+        CurrencyValues statisticCurrency = CurrencyValues.RUB;
+        StatisticJson defaultStatisticJson = spendService.createDefaultStatisticJson(statisticCurrency, userCurrency, dateTo);
+        Map<String, List<SpendJson>> spendsByCategory = spendService.bindSpendsToCategories(defaultStatisticJson, statisticCurrency, userCurrency,
+                List.of(firstSpend, secondSpend));
+        StatisticByCategoryJson statisticByCategoryJson = new StatisticByCategoryJson();
+        for (Map.Entry<String, List<SpendJson>> entry : spendsByCategory.entrySet()) {
+            statisticByCategoryJson = spendService.createStatisticByCategory(statisticCurrency, userCurrency, entry);
+        }
+
+        Map<String, Double> expectedTotalByCategory = new HashMap<>();
+        expectedTotalByCategory.put("Бар", 1350.0);
+
+        Map<String, Double> expectedTotalInUserCurrencyByCategory = new HashMap<>();
+        expectedTotalInUserCurrencyByCategory.put("Бар", 18.0);
+
+        String category = statisticByCategoryJson.getCategory();
+        assertEquals(expectedTotalByCategory.get(category), statisticByCategoryJson.getTotal());
+        assertEquals(expectedTotalInUserCurrencyByCategory.get(category), statisticByCategoryJson.getTotalInUserDefaultCurrency());
+    }
+
+    @Test
+    void addEmptySpendCategoriesToStatisticTest() {
+        Date dateTo = new Date();
+        CurrencyValues statisticCurrency = CurrencyValues.RUB;
+        CurrencyValues userCurrency = CurrencyValues.USD;
+        StatisticJson defaultStatisticJson = spendService.createDefaultStatisticJson(statisticCurrency, userCurrency, dateTo);
+        Map<String, List<SpendJson>> spendsByCategory = spendService.bindSpendsToCategories(defaultStatisticJson, statisticCurrency, userCurrency, List.of(
+                secondSpend, firstSpend, thirdSpend
+        ));
+
+        List<StatisticByCategoryJson> statisticByCategories = new ArrayList<>();
+        for (Map.Entry<String, List<SpendJson>> entry : spendsByCategory.entrySet()) {
+            StatisticByCategoryJson statisticByCategoryJson = spendService.createStatisticByCategory(statisticCurrency, userCurrency, entry);
+            statisticByCategories.add(statisticByCategoryJson);
+        }
+
+        List<StatisticByCategoryJson> statisticWithEmptyCategories = new ArrayList<>();
+        spendService.addEmptySpendCategoriesToStatistic("dima", spendsByCategory, statisticWithEmptyCategories);
+        spendService.addEmptySpendCategoriesToStatistic("dima", spendsByCategory, statisticByCategories);
+
+        assertEquals(1, statisticWithEmptyCategories.size());
+        assertEquals("Магазин", statisticWithEmptyCategories.get(0).getCategory());
+        assertEquals(0, statisticWithEmptyCategories.get(0).getSpends().size());
+        assertEquals(0.0, statisticWithEmptyCategories.get(0).getTotal(), 0.0);
+        assertEquals(0.0, statisticWithEmptyCategories.get(0).getTotalInUserDefaultCurrency(), 0.0);
+
+        assertEquals(3, statisticByCategories.size());
+
     }
 
     private Date addDaysToDate(Date date, int selector, int days) {
