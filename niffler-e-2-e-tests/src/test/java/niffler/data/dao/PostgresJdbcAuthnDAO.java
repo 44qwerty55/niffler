@@ -20,28 +20,30 @@ import static niffler.data.DataBase.AUTH;
 
 public class PostgresJdbcAuthnDAO implements AuthnDAO {
 
+    private final PasswordEncoder passwordEncoder = PasswordEncoderFactories.createDelegatingPasswordEncoder();
     private static final Logger LOG = LoggerFactory.getLogger(PostgresJdbcAuthnDAO.class);
     private final DataSource ds = DataSourceContext.INSTANCE.getDatatSource(AUTH);
 
     @Override
-    public void createUser(UsersAuthnEntity user, List<AuthoritiesAuthnEntity> authoritiesAuthnEntities) {
-        PasswordEncoder passwordEncoder = PasswordEncoderFactories.createDelegatingPasswordEncoder();
+    public void createUserWithAuthorities(UsersAuthnEntity user, List<AuthoritiesAuthnEntity> authoritiesAuthnEntities) {
+
         String password = passwordEncoder.encode(user.getPassword());
 
         try (Connection con = ds.getConnection();
-            Statement st = con.createStatement()) {
-            String sqlUser = String.format("INSERT INTO users (username, \"password\", enabled, account_non_expired, account_non_locked, credentials_non_expired) VALUES ('%s', '%s', '%s','%s','%s','%s' );",
-                    user.getUsername(), password, user.getEnabled(), user.getAccount_non_expired(),
-                    user.getAccount_non_locked(), user.getCredentials_non_expired());
+             Statement st = con.createStatement()) {
+            String sqlUser = String.format("INSERT INTO users (username, \"password\", enabled, account_non_expired, account_non_locked, credentials_non_expired)" +
+                            " VALUES ('%s', '%s', '%s','%s','%s','%s' );",
+                    user.getUsername(), password, user.getEnabled(), user.getAccountNonExpired(),
+                    user.getAccountNonLocked(), user.getCredentialsNonExpired());
             st.addBatch(sqlUser);
             st.executeBatch();
 
-            user.setId(getUUIDUsername(user.getUsername()));
+            user.setId(getUsersAuthnEntityByUsername(user.getUsername()).getId());
 
             authoritiesAuthnEntities.forEach(au -> {
-                au.setUser_id(user.getId());
+                au.setUserId(user.getId());
                 String sqlAuthorities = String.format("INSERT INTO authorities (user_id, authority) VALUES ('%s','%s');",
-                        au.getUser_id(), au.getAuthorities());
+                        au.getUserId(), au.getAuthorities());
                 try {
                     st.addBatch(sqlAuthorities);
                 } catch (SQLException throwables) {
@@ -54,14 +56,20 @@ public class PostgresJdbcAuthnDAO implements AuthnDAO {
         }
     }
 
-
-    private UUID getUUIDUsername(String username) {
+    @Override
+    public UsersAuthnEntity getUsersAuthnEntityByUsername(String username) {
+        UsersAuthnEntity usersAuthnEntity = new UsersAuthnEntity();
         try (Connection con = ds.getConnection();
              Statement st = con.createStatement()) {
             String sql = "SELECT * FROM users WHERE username = '" + username + "';";
             ResultSet resultSet = st.executeQuery(sql);
             if (resultSet.next()) {
-                return UUID.fromString(resultSet.getString("id"));
+                return usersAuthnEntity
+                        .setId(UUID.fromString(resultSet.getString("id")))
+                        .setAccountNonExpired(resultSet.getBoolean("account_non_expired"))
+                        .setAccountNonLocked(resultSet.getBoolean("account_non_locked"))
+                        .setCredentialsNonExpired(resultSet.getBoolean("credentials_non_expired"))
+                        .setEnabled(resultSet.getBoolean("enabled"));
             } else {
                 String msg = "Can`t find user by username: " + username;
                 LOG.error(msg);
@@ -72,7 +80,6 @@ public class PostgresJdbcAuthnDAO implements AuthnDAO {
             LOG.error("Error while database operation", e);
             throw new RuntimeException(e);
         }
+
     }
-
-
 }

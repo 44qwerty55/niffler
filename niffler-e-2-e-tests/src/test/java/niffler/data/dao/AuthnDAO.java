@@ -7,6 +7,8 @@ import java.util.List;
 
 public interface AuthnDAO extends DAO {
 
-   void createUser(UsersAuthnEntity users, List<AuthoritiesAuthnEntity> authoritiesAuthnEntities);
+   void createUserWithAuthorities(UsersAuthnEntity users, List<AuthoritiesAuthnEntity> authoritiesAuthnEntities);
+
+    UsersAuthnEntity getUsersAuthnEntityByUsername(String username);
 
     }

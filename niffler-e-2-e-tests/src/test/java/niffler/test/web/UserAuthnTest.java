@@ -27,7 +27,7 @@ public class UserAuthnTest extends BaseTest {
     @BeforeEach
     void addUserDataBeforeTest() {
         user = new GeneratorUserAuthn().GenerateUserWithReadAuthority();
-        authnDAO.createUser(UsersAuthnEntity.fromUserAuthn(user), AuthoritiesAuthnEntity.fromUserAuthn(user));
+        authnDAO.createUserWithAuthorities(UsersAuthnEntity.fromUserAuthn(user), AuthoritiesAuthnEntity.fromUserAuthn(user));
     }
 
     @Test

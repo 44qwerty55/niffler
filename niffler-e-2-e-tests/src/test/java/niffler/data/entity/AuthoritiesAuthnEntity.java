@@ -17,7 +17,7 @@ import java.util.UUID;
 @Entity
 public class AuthoritiesAuthnEntity {
     private UUID id;
-    private UUID user_id;
+    private UUID userId;
     private String authorities;
 
     public static List<AuthoritiesAuthnEntity> fromUserAuthn(UserAuthn user) {
@@ -26,7 +26,7 @@ public class AuthoritiesAuthnEntity {
             AuthoritiesAuthnEntity authoritiesAuthnEntity = new AuthoritiesAuthnEntity();
             authoritiesAuthnEntities.add(authoritiesAuthnEntity
                     .setId(au.getId())
-                    .setUser_id(au.getUser_id())
+                    .setUserId(au.getUser_id())
                     .setAuthorities(au.getAuthorities().AuthoritiesEnum));
         });
         return authoritiesAuthnEntities;

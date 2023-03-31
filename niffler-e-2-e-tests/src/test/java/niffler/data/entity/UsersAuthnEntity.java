@@ -14,25 +14,25 @@ import java.util.UUID;
 @Entity
 public class UsersAuthnEntity {
 
-private UUID id;
-private String username;
-private String password;
-private Boolean enabled;
-private Boolean account_non_expired;
-private Boolean account_non_locked;
-private Boolean credentials_non_expired;
+    private UUID id;
+    private String username;
+    private String password;
+    private Boolean enabled;
+    private Boolean accountNonExpired;
+    private Boolean accountNonLocked;
+    private Boolean credentialsNonExpired;
 
-public static UsersAuthnEntity fromUserAuthn(UserAuthn user) {
-    UsersAuthnEntity usersAuthnEntity = new UsersAuthnEntity();
-    usersAuthnEntity
-            .setId(user.getId())
-            .setUsername(user.getUsername())
-            .setPassword(user.getPassword())
-            .setEnabled(user.getEnabled())
-            .setAccount_non_expired(user.getAccount_non_expired())
-            .setAccount_non_locked(user.getAccount_non_locked())
-            .setCredentials_non_expired(user.getCredentials_non_expired());
-    return usersAuthnEntity;
-}
+    public static UsersAuthnEntity fromUserAuthn(UserAuthn user) {
+        UsersAuthnEntity usersAuthnEntity = new UsersAuthnEntity();
+        usersAuthnEntity
+                .setId(user.getId())
+                .setUsername(user.getUsername())
+                .setPassword(user.getPassword())
+                .setEnabled(user.getEnabled())
+                .setAccountNonExpired(user.getAccount_non_expired())
+                .setAccountNonLocked(user.getAccount_non_locked())
+                .setCredentialsNonExpired(user.getCredentials_non_expired());
+        return usersAuthnEntity;
+    }
 
 }
