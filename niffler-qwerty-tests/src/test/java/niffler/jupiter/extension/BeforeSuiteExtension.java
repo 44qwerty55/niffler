@@ -1,10 +1,13 @@
 package niffler.jupiter.extension;
 
+import com.codeborne.selenide.Configuration;
 import io.restassured.RestAssured;
 import io.restassured.filter.log.RequestLoggingFilter;
 import io.restassured.filter.log.ResponseLoggingFilter;
 import org.awaitility.Awaitility;
 import org.junit.jupiter.api.extension.ExtensionContext;
+import org.openqa.selenium.chrome.ChromeOptions;
+import org.openqa.selenium.remote.DesiredCapabilities;
 
 import java.nio.charset.StandardCharsets;
 import java.util.List;
@@ -22,6 +25,14 @@ public class BeforeSuiteExtension implements AroundAllTestsExtension {
         Awaitility.setDefaultPollInterval(5, TimeUnit.SECONDS);
         Awaitility.setDefaultTimeout(60, TimeUnit.SECONDS);
         System.out.println("BEFORE SUITE");
+
+        Configuration.browserSize = "1920x1080";
+        DesiredCapabilities desiredCapabilities = new DesiredCapabilities();
+        ChromeOptions chromeOptions = new ChromeOptions();
+        chromeOptions.addArguments("--remote-allow-origins=*");
+        desiredCapabilities.setCapability(ChromeOptions.CAPABILITY, chromeOptions);
+        desiredCapabilities.setAcceptInsecureCerts(true);
+        Configuration.browserCapabilities = desiredCapabilities;
     }
 
     @Override

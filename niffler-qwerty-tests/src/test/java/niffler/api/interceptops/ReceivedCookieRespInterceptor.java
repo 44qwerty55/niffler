@@ -1,6 +1,8 @@
 package niffler.api.interceptops;
 
 import niffler.api.context.CookieHolder;
+import niffler.api.logging.CookiesAllureAppender;
+import niffler.api.logging.CookiesAttachment;
 import okhttp3.Interceptor;
 import okhttp3.Response;
 
@@ -24,6 +26,8 @@ public class ReceivedCookieRespInterceptor implements Interceptor {
                     loginDataHolder.removeCookie(keyValuePair[0]);
                     if (keyValuePair.length == 2) {
                         storedCookies.add(keyValuePair[0] + "=" + keyValuePair[1]);
+                        new CookiesAllureAppender().addAttachment(
+                              new CookiesAttachment(keyValuePair[0], keyValuePair[1]));
                     }
                 }
             }

@@ -5,12 +5,11 @@ import niffler.api.NifflerAuthClient;
 import niffler.api.NifflerUseDataClient;
 import niffler.api.SpendClient;
 import niffler.config.Config;
-import niffler.jupiter.annotation.ApiLogin;
-import niffler.jupiter.annotation.GenerateCategory;
-import niffler.jupiter.annotation.GenerateUser;
-import niffler.jupiter.annotation.User;
+import niffler.jupiter.annotation.*;
 import niffler.model.CategoryJson;
+import niffler.model.SpendDto;
 import niffler.model.UserJson;
+import niffler.utils.DateUtils;
 import org.junit.jupiter.api.extension.*;
 import retrofit2.Response;
 
@@ -18,6 +17,7 @@ import java.util.*;
 
 import static niffler.utils.DataUtils.generateRandomPassword;
 import static niffler.utils.DataUtils.generateRandomUsername;
+import static org.hibernate.internal.util.StringHelper.isEmpty;
 
 public class CreateUserExtension implements BeforeEachCallback, ParameterResolver {
 
@@ -54,7 +54,23 @@ public class CreateUserExtension implements BeforeEachCallback, ParameterResolve
                     createdCategories.add(spendClient.postCategory(cj));
                 }
             }
+            GenerateSpend[] spends = entry.getValue().spends();
+            List<SpendDto> createdSpends = new ArrayList<>();
+            if (spends != null && spends.length > 0) {
+                for (GenerateSpend spend : spends) {
+                    SpendDto sp = new SpendDto();
+                    sp.setUsername(username);
+                    sp.setSpendDate(!isEmpty(spend.spendDate()) ? DateUtils.fromString(spend.spendDate()) : new Date());
+                    sp.setCategory(spend.category());
+                    sp.setCurrency(spend.currency());
+                    sp.setAmount(spend.amount());
+                    sp.setDescription(spend.description());
+                    createdSpends.add(spendClient.postSpend(sp).extract().as(SpendDto.class));
+                }
+            }
+
             userJson.setCategoryJsons(createdCategories);
+            userJson.setSpendJsons(createdSpends);
             context.getStore(entry.getKey().getNamespace()).put(testId, userJson);
         }
     }
